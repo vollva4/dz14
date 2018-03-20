@@ -3,6 +3,7 @@ require_once ('dbConnect.php');
 if (isset($_COOKIE["logged_in"])) {
     $login = $_COOKIE["logged_in"];
     $addButton = 'Добавить'; 
+    $select = "SELECT t.id as task_id, t.description as description, u.id as author_id, u.login as author_name, au.id as assigned_user_id, au.login as assigned_user_name, t.is_done as is_done, t.date_added as date_added FROM task t WHERE u.login = $login INNER JOIN user u ON u.id=t.user_id INNER JOIN user au ON t.assigned_user_id=au.id";
     if($_GET) {
         $id = $_GET['id'];
         if ($_GET['action'] === 'delete') {

@@ -4,7 +4,8 @@ print_r($_POST);
 print_r($_GET);
 require_once ('dbConnect.php');
 require_once ('form.php');
-$select = "SELECT t.id as task_id, t.description as description, u.id as author_id, u.login as author_name, au.id as assigned_user_id, au.login as assigned_user_name, t.is_done as is_done, t.date_added as date_added FROM task t INNER JOIN user u ON u.id=t.user_id INNER JOIN user au ON t.assigned_user_id=au.id";
+$selectOne = "SELECT t.id as task_id, t.description as description, u.id as author_id, u.login as author_name, au.id as assigned_user_id, au.login as assigned_user_name, t.is_done as is_done, t.date_added as date_added FROM task t  INNER JOIN user u ON u.id=t.user_id INNER JOIN user au ON t.assigned_user_id=au.id WHERE u.login = '$login' ;";
+$selectTwo = "SELECT t.id as task_id, t.description as description, u.id as author_id, u.login as author_name, au.id as assigned_user_id, au.login as assigned_user_name, t.is_done as is_done, t.date_added as date_added FROM task t  INNER JOIN user u ON u.id=t.user_id INNER JOIN user au ON t.assigned_user_id=au.id WHERE au.login = '$login' AND u.login != '$login' ;";
 ?>
 
 <!doctype html>
@@ -51,11 +52,11 @@ table {
         </tr>
         <?php
         //Наполнение таблицы деталями каждой задачи
-        $stmt = $pdo->prepare($select);
+        $stmt = $pdo->prepare($selectOne);
         $stmt->execute();
         $list = $stmt->fetchAll();
         foreach ($list as $row) {
-            if ($login === $row['author_name']) { //Только задачи за авторством текущего пользователя
+ //           if ($login === $row['author_name']) { //Только задачи за авторством текущего пользователя
                 echo '<tr>
                           <td>' . $row['description'] . '</td>
                           <td>' . $row['date_added'] . '</td>
@@ -96,7 +97,7 @@ table {
                 </td></tr>
 
                 <?php
-            }
+       //     }
         }
         ?>
     </table>
@@ -111,9 +112,12 @@ table {
         <th>Автор</th>
     </tr>
     <?php
+    $stmt = $pdo->prepare($selectTwo);
+    $stmt->execute();
+    $list = $stmt->fetchAll();
     foreach ($list as $row) {
         // Только задачи для текущего пользователя от других пользователей
-        if ($login === $row['assigned_user_name'] && $login !== $row['author_name']) {
+ //       if ($login === $row['assigned_user_name'] && $login !== $row['author_name']) {
             echo '<tr>
                     <td>' . $row['description'] . '</td>
                     <td>' . $row['date_added'] . '</td>
@@ -131,7 +135,7 @@ table {
                   </td>
                   <td>' . $row['assigned_user_name'] . '</td>
                   <td>' . $row['author_name'] . '</td>';
-        }
+      //  }
     }
     ?>
 
